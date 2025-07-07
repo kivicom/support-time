@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+
+  php:
+    image: php:8.3-fpm-alpine
+    container_name: php-support-time
+    volumes:
+      - .:/var/www/html
+      - ./logs:/var/www/html/logs
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-support-time
+    ports:
+      - "${PORTS}"
+    volumes:
+      - .:/var/www/html
+      - ./logs:/var/www/html/logs
+    depends_on:
+      - php
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # логирование приложения
+  support-time-log:
+    image: busybox
+    volumes:
+      - ./logs:/var/www/html/logs
+    command: tail -f /var/www/html/logs/app.log
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: "${AWS_LOG_GROUP}"
+        awslogs-stream: "support-time/app.log"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-create-group: "true"
+
+  php-errors-log:
+    image: busybox
+    volumes:
+      - ./logs:/var/www/html/logs
+    command: tail -f /var/www/html/logs/php_errors.log
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: "${AWS_LOG_GROUP}"
+        awslogs-stream: "support-time/php_errors.log"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-create-group: "true"

@@ -1,0 +1,47 @@
+{% extends "layout.twig" %}
+
+{% block title %}Форма отчета{% endblock %}
+
+{% block content %}
+    <h2>Форма отчета:</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Дата и день недели</th>
+            {% for user in users %}
+                <th>{{ user }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for day, row in report %}
+            <tr>
+                <td>{{ day|date('d.m.Y, D')|replace({'Mon':'пн','Tue':'вт','Wed':'ср','Thu':'чт','Fri':'пт','Sat':'сб','Sun':'вс'}) }}</td>
+                {% for user in users %}
+                    {% set r = row[user] ?? {} %}
+                    <td>
+                        {% set parts = [] %}
+                        {% if r.work %} {% set parts = parts|merge([r.work ~ 'ч рабочее']) %} {% endif %}
+                        {% if r.notes %} {% set parts = parts|merge([r.notes ~ 'ч только заметки']) %} {% endif %}
+                        {% if r.bonus %} {% set parts = parts|merge([r.bonus ~ 'ч нерабочее']) %} {% endif %}
+                        {{ parts|join(', ') }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr>
+            <td><strong>Итого</strong></td>
+            {% for user in users %}
+                {% set t = totals[user] ?? {} %}
+                <td>
+                    {% set totalParts = [] %}
+                    {% if t.work %} {% set totalParts = totalParts|merge([t.work ~ 'ч рабочее']) %} {% endif %}
+                    {% if t.notes %} {% set totalParts = totalParts|merge([t.notes ~ 'ч только заметки']) %} {% endif %}
+                    {% if t.bonus %} {% set totalParts = totalParts|merge([t.bonus ~ 'ч нерабочее']) %} {% endif %}
+                    {{ totalParts|join(', ') }}
+                </td>
+            {% endfor %}
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

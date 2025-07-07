@@ -1,0 +1,57 @@
+{% extends "layout.twig" %}
+
+{% block title %}Загрузка CSV{% endblock %}
+
+{% block content %}
+    <div class="form-row">
+        <div class="form-upload">
+            <h2>Загрузка CSV</h2>
+            <form id="upload-form" method="post" enctype="multipart/form-data">
+                <textarea name="csvtext" placeholder="Вставьте содержимое CSV..."></textarea><br>
+                <input type="file" name="csvfile"><br>
+                <button type="submit">Загрузить</button>
+            </form>
+        </div>
+
+        <div class="form-types">
+            {% if schedule is not empty %}
+                <h2>Даты и сотрудники</h2>
+                <form id="daytype-form">
+                    <input type="hidden" name="raw" value='{{ raw|json_encode|e }}'>
+                    <input type="hidden" name="schedule" value='{{ schedule|json_encode|e }}'>
+                    <input type="hidden" name="users" value='{{ users|json_encode|e }}'>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            {% for user in users %}
+                                <th>{{ user }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for day, row in schedule %}
+                            <tr>
+                                <td>{{ day|date('d.m.Y, D')|replace({'Mon':'пн','Tue':'вт','Wed':'ср','Thu':'чт','Fri':'пт','Sat':'сб','Sun':'вс'}) }}</td>
+                                {% for user in users %}
+                                    <td>
+                                        <label><input type="radio" name="daytype[{{ row[user].hash }}]" value="work" checked> Рабочий</label><br>
+                                        <label><input type="radio" name="daytype[{{ row[user].hash }}]" value="offwork"> Нерабочий</label><br>
+                                        <label><input type="radio" name="daytype[{{ row[user].hash }}]" value="weekend"> Выходной</label><br>
+                                        <label><input type="radio" name="daytype[{{ row[user].hash }}]" value="notes"> Заметки</label><br>
+                                        <label><input type="checkbox" name="bonus[{{ row[user].hash }}]" value="1"> +20%</label>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit">Рассчитать</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="report-container" style="margin-top: 40px;"></div>
+{% endblock %}
