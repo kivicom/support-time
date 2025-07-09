@@ -7,6 +7,7 @@
         <div class="form-upload">
             <h2>Загрузка CSV</h2>
             <form id="upload-form" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="form">
                 <textarea name="csvtext" placeholder="Вставьте содержимое CSV..."></textarea><br>
                 <input type="file" name="csvfile"><br>
                 <button type="submit">Загрузить</button>
@@ -17,6 +18,7 @@
             {% if schedule is not empty %}
                 <h2>Даты и сотрудники</h2>
                 <form id="daytype-form">
+                    <input type="hidden" name="action" value="report">
                     <input type="hidden" name="raw" value='{{ raw|json_encode|e }}'>
                     <input type="hidden" name="schedule" value='{{ schedule|json_encode|e }}'>
                     <input type="hidden" name="users" value='{{ users|json_encode|e }}'>
