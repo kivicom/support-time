@@ -1,55 +1,34 @@
-version: '3.8'
-
+version: "3.8"
 services:
-
-  php:
-    image: php:8.3-fpm-alpine
-    container_name: php-support-time
+  app:
+    container_name: "${NAME}"
+    image: "${NAME}"
+    restart: always
+    build:
+      context: .
     volumes:
-      - .:/var/www/html
       - ./logs:/var/www/html/logs
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx-support-time
     ports:
       - "${PORTS}"
-    volumes:
-      - .:/var/www/html
-      - ./logs:/var/www/html/logs
-    depends_on:
-      - php
-    restart: unless-stopped
+    environment:
+      DOMAIN: "${DOMAIN}"
+    env_file:
+      - .env
     logging:
-      driver: "json-file"
+      driver: awslogs
       options:
-        max-size: "10m"
-        max-file: "3"
-
-  # логирование приложения
-  support-time-log:
+        awslogs-group: "${AWS_LOG_GROUP}"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream: "support-time-elest.io/access.log"
+  support-time-app-log:
     image: busybox
     volumes:
       - ./logs:/var/www/html/logs
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: "${AWS_LOG_GROUP}"
+        awslogs-stream: "support-time-elest.io/app.log"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-create-group: "true"
     command: tail -f /var/www/html/logs/app.log
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: "${AWS_LOG_GROUP}"
-        awslogs-stream: "support-time/app.log"
-        awslogs-region: "${AWS_REGION}"
-        awslogs-create-group: "true"
-
-  php-errors-log:
-    image: busybox
-    volumes:
-      - ./logs:/var/www/html/logs
-    command: tail -f /var/www/html/logs/php_errors.log
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: "${AWS_LOG_GROUP}"
-        awslogs-stream: "support-time/php_errors.log"
-        awslogs-region: "${AWS_REGION}"
-        awslogs-create-group: "true"
