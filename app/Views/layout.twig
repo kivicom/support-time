@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Отчёт{% endblock %}</title>
-    <link rel="stylesheet" href="{{ base_path }}/css/styles.css">
+    <link rel="stylesheet" href="{{ base_path }}/public/css/styles.css">
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -12,7 +12,7 @@
 <script>
     window.BASE_PATH = '{{ base_path }}';
 </script>
-<script src="{{ base_path }}/js/report.js"></script>
+<script src="{{ base_path }}/public/js/report.js"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
