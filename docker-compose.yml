@@ -1,29 +1,38 @@
-version: "3.8"
+version: '3.8'
+
 services:
-  app:
-    container_name: "${NAME}"
-    image: "${NAME}"
-    restart: always
-    build:
-      context: .
+
+  php:
+    image: php:8.3-fpm-alpine
+    container_name: php-support-time
     volumes:
+      - .:/var/www/html
       - ./logs:/var/www/html/logs
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-support-time
     ports:
       - "${PORTS}"
-    environment:
-      DOMAIN: "${DOMAIN}"
-    env_file:
-      - .env
+    volumes:
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./logs:/var/www/html/logs
+    depends_on:
+      - php
+    restart: unless-stopped
     logging:
-      driver: awslogs
+      driver: "json-file"
       options:
-        awslogs-group: "${AWS_LOG_GROUP}"
-        awslogs-region: "${AWS_REGION}"
-        awslogs-stream: "support-time-elest.io/access.log"
+        max-size: "10m"
+        max-file: "3"
+
   support-time-app-log:
     image: busybox
     volumes:
       - ./logs:/var/www/html/logs
+    command: tail -f /var/www/html/logs/app.log
     logging:
       driver: awslogs
       options:
@@ -31,4 +40,3 @@ services:
         awslogs-stream: "support-time-elest.io/app.log"
         awslogs-region: "${AWS_REGION}"
         awslogs-create-group: "true"
-    command: tail -f /var/www/html/logs/app.log
