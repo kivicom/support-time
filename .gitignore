@@ -4,3 +4,4 @@ cache/*
 !cache/.gitkeep
 logs/*
 !logs/.gitkeep
+app/.DS_Store

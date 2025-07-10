@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportContainer = document.getElementById('report-container');
 
     // Убедимся, что BASE_PATH определён
-    const BASE_PATH = window.BASE_PATH || '/support-time';
+    const BASE_PATH = window.BASE_PATH;
 
     if (uploadForm) {
 

@@ -2,7 +2,6 @@
 
 use App\Controllers\FormController;
 use App\Controllers\ReportController;
-use App\Services\AppLogger;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;

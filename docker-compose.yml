@@ -32,7 +32,7 @@ services:
     image: busybox
     volumes:
       - ./logs:/var/www/html/logs
-    command: tail -f /var/www/html/logs/app.log
+    command: sh -c "touch /var/www/html/app.log && tail -f /var/www/html/app.log"
     logging:
       driver: awslogs
       options:
